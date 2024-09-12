@@ -1,0 +1,70 @@
+name: Build xray-core
+on:
+  watch:
+    types: started
+  workflow_dispatch:
+
+jobs:
+  build-xray-core:
+    if: github.event.repository.owner.id == github.event.sender.id
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.22
+        check-latest: true
+
+    - name: Clone Xray-core Source
+      run: |
+        git clone https://github.com/seav1/Xray-core
+        cd Xray-core
+        go mod download
+
+    - name: Get Latest Release
+      run: |
+        RELEASE_TITLE=$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | jq -r 'first(.[]).name')
+        echo "release_title=$RELEASE_TITLE" >> $GITHUB_ENV
+        RELEASE_COMMITS=$(curl -s https://api.github.com/repos/XTLS/Xray-core/commits/main | grep -oP '"sha": "\K(.*)(?=")' | head -1)
+        echo "release_commits=$RELEASE_COMMITS" >> $GITHUB_ENV
+        echo "https://github.com/XTLS/Xray-core/commit/$RELEASE_COMMITS"
+
+    - name: Build for AMD64
+      run: |
+        cd Xray-core
+        go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+        go build -v -o xray-linux-amd64 -trimpath -ldflags "-s -w -buildid=" ./main
+
+    - name: Build for ARM64
+      run: |
+        cd Xray-core
+        go env -w CGO_ENABLED=0 GOOS=linux GOARCH=arm64
+        go build -v -o xray-linux-arm64 -trimpath -ldflags "-s -w -buildid=" ./main
+
+    - name: Build for AMD64
+      run: |
+        cd Xray-core
+        go env -w CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64
+        go build -v -o xray-freebsd-amd64 -trimpath -ldflags "-s -w -buildid=" ./main
+
+    - name: Delete current release assets
+      uses: andreaswilli/delete-release-assets-action@v3.0.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        tag: latest
+        deleteOnlyFromDrafts: false
+
+    - name: Create and Upload Release
+      id: upload_release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        release_name: ${{env.release_title}}
+        tag: latest
+        body: |
+          Latest commit from the main branch:
+          https://github.com/XTLS/Xray-core/commit/${{env.release_commits}}
+        file_glob: true
+        overwrite: true
+        file: ./Xray-core/xray-*
