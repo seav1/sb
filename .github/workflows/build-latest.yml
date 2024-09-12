@@ -18,35 +18,35 @@ jobs:
 
     - name: Clone Xray-core Source
       run: |
-        git clone https://github.com/seav1/Xray-core
-        cd Xray-core
+        git clone https://github.com/seav1/singbox
+        cd singbox
         go mod download
 
     - name: Get Latest Release
       run: |
-        RELEASE_TITLE=$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | jq -r 'first(.[]).name')
+        RELEASE_TITLE=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases | jq -r 'first(.[]).name')
         echo "release_title=$RELEASE_TITLE" >> $GITHUB_ENV
-        RELEASE_COMMITS=$(curl -s https://api.github.com/repos/XTLS/Xray-core/commits/main | grep -oP '"sha": "\K(.*)(?=")' | head -1)
+        RELEASE_COMMITS=$(curl -s https://api.github.com/repos/SagerNet/sing-box/commits/main | grep -oP '"sha": "\K(.*)(?=")' | head -1)
         echo "release_commits=$RELEASE_COMMITS" >> $GITHUB_ENV
-        echo "https://github.com/XTLS/Xray-core/commit/$RELEASE_COMMITS"
+        echo "https://github.com/SagerNet/sing-box/commit/$RELEASE_COMMITS"
 
     - name: Build for AMD64
       run: |
         cd Xray-core
         go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-        go build -v -o xray-linux-amd64 -trimpath -ldflags "-s -w -buildid=" ./main
+        go build -v -o sing-box-amd64 -trimpath -ldflags "-s -w -buildid=" ./main
 
     - name: Build for ARM64
       run: |
         cd Xray-core
         go env -w CGO_ENABLED=0 GOOS=linux GOARCH=arm64
-        go build -v -o xray-linux-arm64 -trimpath -ldflags "-s -w -buildid=" ./main
+        go build -v -o sing-box-arm64 -trimpath -ldflags "-s -w -buildid=" ./main
 
     - name: Build for AMD64
       run: |
         cd Xray-core
         go env -w CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64
-        go build -v -o xray-freebsd-amd64 -trimpath -ldflags "-s -w -buildid=" ./main
+        go build -v -o sing-box-freebsd-amd64 -trimpath -ldflags "-s -w -buildid=" ./main
 
     - name: Delete current release assets
       uses: andreaswilli/delete-release-assets-action@v3.0.0
