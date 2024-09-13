@@ -34,19 +34,19 @@ jobs:
       run: |
         cd singbox
         go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-        go build -v -o sing-box-amd64 -trimpath -ldflags "-s -w -buildid=" .
+        go build -v -o sing-box-amd64 -trimpath -ldflags "-s -w -buildid=" ./cmd/sing-box
 
     - name: Build for ARM64
       run: |
         cd singbox
         go env -w CGO_ENABLED=0 GOOS=linux GOARCH=arm64
-        go build -v -o sing-box-arm64 -trimpath -ldflags "-s -w -buildid=" .
+        go build -v -o sing-box-arm64 -trimpath -ldflags "-s -w -buildid=" ./cmd/sing-box
 
     - name: Build for AMD64
       run: |
         cd singbox
         go env -w CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64
-        go build -v -o sing-box-freebsd-amd64 -trimpath -ldflags "-s -w -buildid=" .
+        go build -v -o sing-box-freebsd-amd64 -trimpath -ldflags "-s -w -buildid=" ./cmd/sing-box
 
     - name: Delete current release assets
       uses: andreaswilli/delete-release-assets-action@v3.0.0
