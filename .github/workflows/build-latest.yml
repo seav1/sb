@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-xray-core:
+  build-singe-box:
     if: github.event.repository.owner.id == github.event.sender.id
     runs-on: ubuntu-latest
 
@@ -16,7 +16,7 @@ jobs:
         go-version: 1.22
         check-latest: true
 
-    - name: Clone Xray-core Source
+    - name: Clone sing-box Source
       run: |
         git clone https://github.com/seav1/singbox
         cd singbox
@@ -64,7 +64,7 @@ jobs:
         tag: latest
         body: |
           Latest commit from the main branch:
-          https://github.com/XTLS/Xray-core/commit/${{env.release_commits}}
+          https://github.com/seav1/sing-box/commit/${{env.release_commits}}
         file_glob: true
         overwrite: true
         file: ./singbox/sing-box-*
