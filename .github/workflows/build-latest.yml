@@ -67,4 +67,4 @@ jobs:
           https://github.com/XTLS/Xray-core/commit/${{env.release_commits}}
         file_glob: true
         overwrite: true
-        file: ./Xray-core/xray-*
+        file: ./singbox/sing-box-*
